@@ -1,9 +1,8 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, Suspense } from "react"
 import { graphql, Link } from "gatsby"
 import { MDXProvider } from "@mdx-js/react"
 import { RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri"
 import { GatsbyImage, getImage, ImageDataLike } from "gatsby-plugin-image"
-import { Disqus } from "gatsby-plugin-disqus"
 import { useLocation } from "@reach/router"
 
 import DefaultLayout from "@pitayan/gatsby-theme-pitayan/src/layouts/Default"
@@ -21,6 +20,8 @@ import { useSiteMetadata } from "@pitayan/gatsby-theme-pitayan/src/hooks"
 import { SOCIAL_RESOURCES } from "@pitayan/gatsby-theme-pitayan/src/constants"
 import { Author } from "@pitayan/gatsby-theme-pitayan/src/pages/authors"
 import PostsGroup, { PostNode } from "@pitayan/gatsby-theme-pitayan/src/components/PostsGroup"
+
+const LazyDisqus = React.lazy(() => import("gatsby-plugin-disqus"))
 
 type PostProps = {
   data: {
@@ -186,13 +187,15 @@ const Post: React.FC<PostProps> = ({
       </div>
 
       <div className="my-8 max-w-lg md:max-w-2xl mx-auto">
-        <Disqus
-          config={{
-            url: `${siteUrl}${slug}`,
-            identifier: slug,
-            title: title,
-          }}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <LazyDisqus
+            config={{
+              url: `${siteUrl}${slug}`,
+              identifier: slug,
+              title: title,
+            }}
+          />
+        </Suspense>
       </div>
 
       <div className="my-8 max-w-lg md:max-w-2xl mx-auto">
